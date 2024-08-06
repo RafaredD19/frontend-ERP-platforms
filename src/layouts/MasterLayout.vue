@@ -1,38 +1,187 @@
-<!-- src/layouts/SidebarLayout.vue -->
 <template>
-    <div class="flex h-screen bg-gray-200">
-      <!-- Sidebar -->
-      <div :class="['bg-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform', sidebarOpen ? 'translate-x-0' : '-translate-x-full']" @click="sidebarOpen = false" @keydown="sidebarOpen = false" v-show="sidebarOpen">
-        <h1 class="text-2xl font-semibold text-center">Menú</h1>
-        <nav>
-          <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">Perfil</a>
-          <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">Configuración</a>
-          <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">Cerrar sesión</a>
-        </nav>
-      </div>
-      <!-- Main content -->
-      <div class="flex-1 p-10">
-        <button @click="sidebarOpen = !sidebarOpen" class="bg-blue-500 text-white p-2 rounded-md">
-          Toggle Sidebar
-        </button>
-        <router-view />
-      </div>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
+  <v-card>
+      <v-layout>
+          <v-navigation-drawer v-model="drawer" :rail="rail" permanent @click="rail = false" color="indigo-darken-1"
+              class="border-0">
+              <div class="p-2 py-7 flex items-center justify-center gap-2">
+                  <div>
+                      <div class="p-1 pt-4 flex items-center justify-center">
+                          <img :src="logoEdriver" class="w-[6rem] bg-gray-100 rounded-md" />
+                      </div>
+                      <p v-if="!rail" class="font-bold text-2xl text-center w-full">eDriver</p>
+                  </div>
+              </div>
+              <v-list>
+                  <div v-for="itemNavegation in filteredItems" :key="itemNavegation.value">
+                      <router-link :to="itemNavegation.to" v-if="itemNavegation.children.length == 0">
+                          <v-list-item @click="selectItem(itemNavegation.to)" :prepend-icon="itemNavegation.icon"
+                              :title="itemNavegation.title" :value="itemNavegation.value"
+                              :class="{ 'selected-item': selectedItem === itemNavegation.to }"></v-list-item>
+                      </router-link>
+                      <v-list-group v-else :value="itemNavegation.value" fluid>
+                          <template v-slot:activator="{ props }">
+                              <v-list-item v-bind="props" :prepend-icon="itemNavegation.icon" :title="itemNavegation.title"
+                                  active-class="bg-indigo-lighten-1"></v-list-item>
+                          </template>
+                          <div :class="{ 'my-2 border-l-4 border-blue-500 ml-3': !rail, 'my-2 border-l-4 border-blue-700': rail }">
+                              <router-link :to="item.to" v-for="item in itemNavegation.children" :key="item.value" class="rounded-md">
+                                  <v-list-item @click="selectItem(item.to)" :prepend-icon="item.icon" :title="item.title"
+                                      :value="item.value" active-class="blue-darken-3 rounded-md"
+                                      :class="{ 'selected-item': selectedItem === item.to }"></v-list-item>
+                              </router-link>
+                          </div>
+                      </v-list-group>
+                  </div>
+              </v-list>
+          </v-navigation-drawer>
+          <v-main class="h-screen bg-slate-100 block">
+              <div class="w-full bg-white flex justify-between items-center px-3 shadow-sm">
+                  <v-btn variant="text" icon="mdi-menu" color="blue-grey-lighten-1" class="cursor-pointer"
+                      @click.stop="rail = !rail"></v-btn>
+                  <div class="flex items-center">
+                      <div class="flex items-center text-start text-xs">
+                          <v-list>
+                              <v-list-item class="text-start item-personalizado" :prepend-avatar="avatarPath">
+                                  <template v-slot:default>
+                                      <v-row>
+                                          <v-col>
+                                              <div class="text-sm">Hola, {{ username }}</div>
+                                              <div class="caption">{{ rol }}</div>
+                                          </v-col>
+                                      </v-row>
+                                  </template>
+                              </v-list-item>
+                          </v-list>
+                      </div>
+                      <MenuAsPopover />
+                  </div>
+              </div>
+              <section class="overflow-y-auto section_main" :class="isMobile ? 'p-4' : 'p-8'">
+                  <router-view />
+              </section>
+          </v-main>
+      </v-layout>
+  </v-card>
+</template>
+
+<script>
+import { ref, onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import MenuAsPopover from '@/components/general/MenuAsPopover.vue';
+// import avatarImage from "@/assets/iconuser_hombre.png";
+// import LogoEdriver from "@/assets/logo.png";
+import store from '@/store';
+
+export default {
+  components: {
+       MenuAsPopover
+  },
+  data() {
       return {
-        sidebarOpen: false,
+          // avatarPath: avatarImage,
+          // logoEdriver: LogoEdriver
+      }
+  },
+  setup() {
+      const isMobile = ref(false);
+      const drawer = ref(true);
+      const rail = ref(true);
+      const rol = ref('');
+      const username = ref('');
+      const selectedItem = ref(null);
+      const ItemsNavegation = ref([
+          {
+              icon: "mdi-file-question-outline",
+              title: "Formularios",
+              value: "forms",
+              to: "/forms",
+              children: []
+          },
+          {
+              icon: "mdi-form-select",
+              title: "Reportes formularios",
+              value: "reportsforms",
+              to: "/reportsforms",
+              children: []
+          },
+          {
+              icon: "mdi-domain",
+              title: "Compañias",
+              value: "companies",
+              to: "/customers",
+              children: []
+          },
+          {
+              icon: "mdi-account-group",
+              title: "Administradores",
+              value: "administrator",
+              to: "/administrator",
+              children: []
+          }
+      ]);
+
+      const router = useRoute();
+
+      onMounted(() => {
+          rol.value = "Administrador";
+          username.value = store.state.username;
+          handleResize();
+          window.addEventListener("resize", handleResize);
+          selectedItem.value = router.fullPath;
+      });
+
+      const filteredItems = computed(() => {
+          if (store.state.role === 'ADMIN_ROLE') {
+              return ItemsNavegation.value.filter(item => item.value === 'companies');
+          } else if (store.state.role === 'REGULAR_USER_ROLE') {
+              return ItemsNavegation.value.filter(item => item.value === 'forms' || item.value === 'reportsforms');
+          } else if (store.state.role === 'MASTER_ADMIN_ROLE') {
+              return ItemsNavegation.value.filter(item => item.value === 'administrator');
+          } else {
+              return [];
+          }
+      });
+
+      const handleResize = () => {
+          isMobile.value = window.innerWidth <= 500;
       };
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .transition {
-    transition: transform 0.3s ease;
+
+      const selectItem = (item) => {
+          selectedItem.value = item;
+      };
+
+      return {
+          isMobile,
+          drawer,
+          rail,
+          rol,
+          username,
+          selectedItem,
+          ItemsNavegation,
+          filteredItems,
+          selectItem
+      }
   }
-  </style>
-  
+}
+</script>
+
+<style>
+.selected-item {
+  background-color: #4777bea1 !important;
+  border-right: 4px solid rgb(119, 153, 190);
+}
+
+.v-list-item-title {
+  font-size: 14px !important;
+}
+
+.v-list-item-subtitle {
+  font-size: 13px !important;
+}
+
+.section_main {
+  overflow-y: auto !important;
+  height: 100%;
+  padding-bottom: 5rem !important;
+}
+</style>
