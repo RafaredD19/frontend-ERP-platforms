@@ -5,15 +5,19 @@
           <img :src="imgLogo" alt="Logo Image" class="max-w-full h-auto" />
         </div>
         <div class="md:w-1/2 p-8">
-          <form-login />
+          <form-login @validate-login="onValidateLogin"/>
         </div>
       </div>
     </div>
   </template>
   
   <script>
+  import { ref } from 'vue';
   import FormLogin from '@/components/login/FormLogin.vue';
   import ImgLogo from '@/assets/logoimage.jpg';
+  import { authLoginApi } from '@/api/LoginService';
+import { useRouter } from 'vue-router';
+import store from '@/store';
   
   export default {
     components: {
