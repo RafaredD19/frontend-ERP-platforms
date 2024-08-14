@@ -135,7 +135,7 @@ export default {
               return ItemsNavegation.value.filter(item => item.value === 'companies');
           } else if (store.state.role === 'REGULAR_USER_ROLE') {
               return ItemsNavegation.value.filter(item => item.value === 'forms' || item.value === 'reportsforms');
-          } else if (store.state.role === 'MASTER_ADMIN_ROLE') {
+          } else if (store.state.role === 'SUPER_MASTER') {
               return ItemsNavegation.value.filter(item => item.value === 'administrator');
           } else {
               return [];
