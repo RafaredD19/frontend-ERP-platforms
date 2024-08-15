@@ -19,7 +19,7 @@
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon
           color="red"
-          @click="$emit('delete', item.user._id)"
+          @click="$emit('delete', item._id)"
         >
           mdi-delete
         </v-icon>
@@ -60,6 +60,7 @@ const filteredMasters = computed(() => {
   return props.masters.map(master => ({
     business: master.business,
     user: master.user,
+    _id : master._id
   }));
 });
 </script>

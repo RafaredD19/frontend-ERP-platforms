@@ -79,7 +79,9 @@
   import { ref, onMounted, watch } from 'vue';
   import Swal from 'sweetalert2';
   import { findAllProjects } from "@/api/ProjectsService";
-  import { requiredFieldsMasters, createMasters } from "@/api/AdministratorService";
+ 
+  import { requiredFieldsCompany, createCompany } from "@/api/CompanyService";
+  
   import store from "@/store";
   
   const props = defineProps({
@@ -136,7 +138,7 @@
     const payload = { projectIds: selectedProjects.value };
     
     try {
-      const response = await requiredFieldsMasters(token, payload);
+      const response = await requiredFieldsCompany(token, payload);
       requiredFields.value = response.data.data;
   
       // Inicializa formData con campos vacíos
@@ -173,7 +175,7 @@
     const token = store.state.token;
     
     try {
-      await createMasters(token, payload);
+      await createCompany(token, payload);
       Swal.fire({
         icon: 'success',
         title: 'Éxito',

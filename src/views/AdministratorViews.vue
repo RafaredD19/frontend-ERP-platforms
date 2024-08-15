@@ -31,6 +31,7 @@ const loadMasters = async () => {
     masters.value = response.data.data.map(master => ({
       business: master.business,
       user: master.user,
+      _id : master._id
     }));
   } catch (error) {
     console.error("Error loading masters", error);

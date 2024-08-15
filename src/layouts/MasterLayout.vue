@@ -8,7 +8,7 @@
                       <div class="p-1 pt-4 flex items-center justify-center">
                           <img :src="logoEdriver" class="w-[6rem] bg-gray-100 rounded-md" />
                       </div>
-                      <p v-if="!rail" class="font-bold text-2xl text-center w-full">eDriver</p>
+                      <p v-if="!rail" class="font-bold text-2xl text-center w-full">eBox</p>
                   </div>
               </div>
               <v-list>
@@ -106,9 +106,9 @@ export default {
           },
           {
               icon: "mdi-domain",
-              title: "Compañias",
-              value: "companies",
-              to: "/customers",
+              title: "company",
+              value: "company",
+              to: "/company",
               children: []
           },
           {
@@ -123,7 +123,7 @@ export default {
       const router = useRoute();
 
       onMounted(() => {
-          rol.value = "Administrador";
+          rol.value = store.state.role;
           username.value = store.state.username;
           handleResize();
           window.addEventListener("resize", handleResize);
@@ -131,8 +131,8 @@ export default {
       });
 
       const filteredItems = computed(() => {
-          if (store.state.role === 'ADMIN_ROLE') {
-              return ItemsNavegation.value.filter(item => item.value === 'companies');
+          if (store.state.role === 'MASTER') {
+              return ItemsNavegation.value.filter(item => item.value === 'company');
           } else if (store.state.role === 'REGULAR_USER_ROLE') {
               return ItemsNavegation.value.filter(item => item.value === 'forms' || item.value === 'reportsforms');
           } else if (store.state.role === 'SUPER_MASTER') {

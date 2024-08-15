@@ -33,7 +33,7 @@ export function createMasters(token , payload) {
     })
 }
 export function deleteMasters(token , _id) {
-console.log("===================D", _id)
+
     return axiosInstance.delete(`${baseURL}/masters/${_id}`, {
         headers: {
             Authorization: `Bearer ${token}`
