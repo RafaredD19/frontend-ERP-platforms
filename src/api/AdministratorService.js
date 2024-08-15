@@ -14,3 +14,33 @@ export function findAllMasters(token) {
     })
 }
 
+
+export function requiredFieldsMasters(token , payload) {
+
+    return axiosInstance.post(`${baseURL}/masters/requiredFields`, payload, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
+
+export function createMasters(token , payload) {
+
+    return axiosInstance.post(`${baseURL}/masters`, payload, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
+export function deleteMasters(token , _id) {
+console.log("===================D", _id)
+    return axiosInstance.delete(`${baseURL}/masters/${_id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
+
+
+
+

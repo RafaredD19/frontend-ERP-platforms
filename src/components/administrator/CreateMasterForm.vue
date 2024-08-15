@@ -1,45 +1,86 @@
 <template>
     <v-dialog v-model="dialog" max-width="600px">
-      <v-card>
+      <!-- Paso 1: Selección de proyectos -->
+      <v-card v-if="step === 1">
         <v-card-title>
-          <span class="headline">Crear Master</span>
+          <span class="headline">Seleccionar Proyectos</span>
         </v-card-title>
   
         <v-card-text>
           <v-form ref="form">
-            <v-text-field
-              v-model="form.business"
-              label="Business"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="form.username"
-              label="Username"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="form.role"
-              label="Role"
-              required
-            ></v-text-field>
-            <v-switch
-              v-model="form.status"
-              label="Active"
-            ></v-switch>
+            <div class="mt-4">
+              <v-list>
+                <v-list-item
+                  v-for="project in projects"
+                  :key="project._id"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>{{ project.name }}</v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-switch 
+                      :model-value="selectedProjects.includes(project._id)" 
+                      @change="toggleProject(project._id)"
+                    />
+                  </v-list-item-action>
+                </v-list-item>
+              </v-list>
+            </div>
           </v-form>
         </v-card-text>
   
         <v-card-actions>
+          <v-btn color="red" text @click="close">Cancelar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-          <v-btn color="blue darken-1" text @click="submitForm">Save</v-btn>
+          <v-btn color="primary" text @click="nextStep">Siguiente</v-btn>
         </v-card-actions>
+      </v-card>
+  
+      <!-- Paso 2: Formulario dinámico -->
+      <v-card v-if="step === 2">
+        <v-card-title>
+          <span class="headline">Completar Información del Master</span>
+        </v-card-title>
+  
+        <v-card-text>
+          <v-form ref="requiredFieldsForm">
+            <v-text-field
+              v-for="(label, field) in requiredFields"
+              :key="field"
+              v-model="formData[field]"
+              :label="label"
+              required
+            ></v-text-field>
+          </v-form>
+        </v-card-text>
+  
+        <v-card-actions>
+          <v-btn color="grey" text @click="previousStep">Atrás</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="red" text @click="close">Cancelar</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="submitMasterForm">Guardar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  
+    <!-- Diálogo de Carga -->
+    <v-dialog v-model="dialogLoader" :scrim="false" persistent width="auto">
+      <v-card color="blue">
+        <v-card-text>
+          Procesando...
+          <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+        </v-card-text>
       </v-card>
     </v-dialog>
   </template>
   
   <script setup>
-  import { ref, watch } from 'vue';
+  import { ref, onMounted, watch } from 'vue';
+  import Swal from 'sweetalert2';
+  import { findAllProjects } from "@/api/ProjectsService";
+  import { requiredFieldsMasters, createMasters } from "@/api/AdministratorService";
+  import store from "@/store";
   
   const props = defineProps({
     modelValue: {
@@ -51,6 +92,13 @@
   const emit = defineEmits(['update:modelValue']);
   
   const dialog = ref(props.modelValue);
+  const dialogLoader = ref(false); // Controla la visibilidad del diálogo de carga
+  const step = ref(1); // Controla si estamos en la selección de proyectos o en el formulario
+  
+  const projects = ref([]);
+  const selectedProjects = ref([]);
+  const requiredFields = ref({});
+  const formData = ref({}); // Almacena los datos del formulario dinámico
   
   watch(() => props.modelValue, (newVal) => {
     dialog.value = newVal;
@@ -58,26 +106,103 @@
   
   const close = () => {
     emit('update:modelValue', false);
+    step.value = 1; // Resetea al paso inicial cuando se cierra
+    selectedProjects.value = [];
+    requiredFields.value = {};
+    formData.value = {};
   };
   
-  const form = ref({
-    business: '',
-    username: '',
-    role: '',
-    status: false,
-  });
-  
-  const submitForm = () => {
-    if (form.value.business && form.value.username && form.value.role) {
-      console.log('Form submitted', form.value);
-      close();
-    } else {
-      console.log('Please fill all required fields');
+  const loadProjects = async () => {
+    try {
+      const token = store.state.token;
+      const response = await findAllProjects(token);
+      projects.value = response.data.data;
+    } catch (error) {
+      console.error("Error loading projects", error);
     }
   };
+  
+  const toggleProject = (projectId) => {
+    if (selectedProjects.value.includes(projectId)) {
+      selectedProjects.value = selectedProjects.value.filter(id => id !== projectId);
+    } else {
+      selectedProjects.value.push(projectId);
+    }
+  };
+  
+  const nextStep = async () => {
+    console.log('Proyectos seleccionados:', selectedProjects.value);
+    const token = store.state.token;
+    const payload = { projectIds: selectedProjects.value };
+    
+    try {
+      const response = await requiredFieldsMasters(token, payload);
+      requiredFields.value = response.data.data;
+  
+      // Inicializa formData con campos vacíos
+      for (const field in requiredFields.value) {
+        formData.value[field] = '';
+      }
+  
+      step.value = 2; // Avanza al siguiente paso
+    } catch (error) {
+      console.error("Error fetching required fields:", error);
+      close(); // Cerrar el modal antes de mostrar la alerta
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.response?.data?.message || 'Ocurrió un error al obtener los campos requeridos.',
+      });
+    }
+  };
+  
+  const previousStep = () => {
+    step.value = 1; // Regresa al paso anterior
+  };
+  
+  const submitMasterForm = async () => {
+    // Mostrar el diálogo de carga
+    dialogLoader.value = true;
+  
+    // Construir el payload final
+    const payload = {
+      ...formData.value, 
+      projectIds: selectedProjects.value
+    };
+    
+    const token = store.state.token;
+    
+    try {
+      await createMasters(token, payload);
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito',
+        text: 'El master se creó correctamente.',
+      });
+      // Recargar la página
+      location.reload();
+    } catch (error) {
+      console.error("Error al crear el master:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.response?.data?.message || 'Ocurrió un error al crear el master.',
+      });
+    } finally {
+      // Cerrar el diálogo de carga
+      dialogLoader.value = false;
+      close(); // Cerrar el modal
+    }
+  };
+  
+  onMounted(() => {
+    loadProjects();
+  });
   </script>
   
   <style scoped>
-  /* Estilos específicos para tu formulario */
+  .mt-4 {
+    margin-top: 16px;
+  }
   </style>
   

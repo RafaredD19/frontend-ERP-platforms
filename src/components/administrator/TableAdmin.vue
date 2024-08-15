@@ -15,7 +15,16 @@
       :headers="headers"
       :items="filteredMasters"
       :search="search"
-    ></v-data-table>
+    >
+      <template v-slot:[`item.actions`]="{ item }">
+        <v-icon
+          color="red"
+          @click="$emit('delete', item.user._id)"
+        >
+          mdi-delete
+        </v-icon>
+      </template>
+    </v-data-table>
   </v-card>
 </template>
 
@@ -39,7 +48,12 @@ const headers = [
   },
   { key: 'user.username', title: 'Username' },
   { key: 'user.role', title: 'Role' },
-  { key: 'user.status', title: 'Status' }
+  { key: 'user.status', title: 'Status' },
+  {
+    key: 'actions',
+    title: 'Acciones',
+    align: 'end',
+  },
 ];
 
 const filteredMasters = computed(() => {
