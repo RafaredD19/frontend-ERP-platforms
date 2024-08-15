@@ -10,7 +10,7 @@ import { loadFonts } from './plugins/webfontloader'
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
+store.dispatch('initializeStateFromLocalStorage');
 library.add(faUser, faLock, faEye, faEyeSlash);
 
 loadFonts()

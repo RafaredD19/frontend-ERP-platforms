@@ -1,39 +1,53 @@
 <template>
-  <v-container>
+  <v-card flat>
+    <template v-slot:text>
+      <v-text-field
+        v-model="search"
+        label="Search"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        hide-details
+        single-line
+      ></v-text-field>
+    </template>
+
     <v-data-table
       :headers="headers"
-      :items="masters"
-      class="elevation-1"
-    >
-      <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>Masters</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-      </template>
-    </v-data-table>
-  </v-container>
+      :items="filteredMasters"
+      :search="search"
+    ></v-data-table>
+  </v-card>
 </template>
 
-<script>
-export default {
-  props: {
-    masters: {
-      type: Array,
-      required: true
-    }
-  },
-  data() {
-    return {
-      headers: [
-        { text: "Business", value: "business" },
-        { text: "Username", value: "user.username" },
-        { text: "Role", value: "user.role" },
-        { text: "Status", value: "user.status" }
-      ]
-    };
+<script setup>
+import { computed, ref } from 'vue';
+
+const props = defineProps({
+  masters: {
+    type: Array,
+    required: true
   }
-};
+});
+
+const search = ref('');
+const headers = [
+  {
+    align: 'start',
+    key: 'business',
+    sortable: false,
+    title: 'Business',
+  },
+  { key: 'user.username', title: 'Username' },
+  { key: 'user.role', title: 'Role' },
+  { key: 'user.status', title: 'Status' }
+];
+
+const filteredMasters = computed(() => {
+  return props.masters.map(master => ({
+    business: master.business,
+    user: master.user,
+  }));
+});
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 
-const localStorageKey = 'DJsdfg-2352LLDSF-dfglñdskfgiu38r_[22334ews34>YUVASZghsvdV';
+const localStorageKey = 'DJsdfg-2352LLDSF-dfglñdskfgiu38r_[22334ews34>YUVASZghsvdV1jk';
 
 export default createStore({
     state: {
