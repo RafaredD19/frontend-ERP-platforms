@@ -18,17 +18,22 @@
     >
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon
-          color="red"
-          @click="$emit('delete', item._id)"
-        >
-          mdi-delete
-        </v-icon>
-        
-        <v-icon
           color="blue"
           @click="openDetailForm(item)"
         >
           mdi-file-eye
+        </v-icon>
+        <v-icon
+          color="green"
+          @click="$emit('edit', item)"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon
+          color="red"
+          @click="$emit('delete', item._id)"
+        >
+          mdi-delete
         </v-icon>
       </template>
     </v-data-table>
@@ -85,6 +90,10 @@ const headers = [
 ];
 
 const filteredMasters = computed(() => {
-  return props.masters
+  return props.masters;
 });
 </script>
+
+<style scoped>
+/* Estilos específicos para tu componente */
+</style>

@@ -7,27 +7,31 @@
 
       <v-card-text>
         <v-form ref="form">
-          <!-- Selección de proyectos -->
-          <div class="mt-4">
+           <!-- Selección de proyectos -->
+           <div class="mt-4">
             <h3 class="text-lg font-semibold mb-2">Seleccionar Proyectos</h3>
-            <v-list>
-              <v-list-item
+            <v-row>
+              <v-col
                 v-for="project in projects"
                 :key="project._id"
+                cols="12"
+                sm="4"
               >
-                <v-list-item-content>
-                  <v-list-item-title>{{ project.name }}</v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action>
-                  <v-switch 
-                    :model-value="selectedProjects.includes(project._id)" 
-                    @change="toggleProject(project._id)"
-                    :class="{'switch-on': selectedProjects.includes(project._id), 'switch-off': !selectedProjects.includes(project._id)}"
-                    inset
-                  />
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ project.name }}</v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-switch 
+                      :model-value="selectedProjects.includes(project._id)" 
+                      @change="toggleProject(project._id)"
+                      :class="{'switch-on': selectedProjects.includes(project._id), 'switch-off': !selectedProjects.includes(project._id)}"
+                      inset
+                    />
+                  </v-list-item-action>
+                </v-list-item>
+              </v-col>
+            </v-row>
           </div>
 
           <!-- Campos dinámicos del formulario -->

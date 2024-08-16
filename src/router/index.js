@@ -28,10 +28,16 @@ const router = createRouter({
                     name: "project",
                     path: "project",
                     component: () => import("@/views/ProyectsView.vue"),
+                },
+
+                {
+                    name: "boxproject",
+                    path: "boxproject",
+                    component: () => import("@/views/ProjectsBoxView.vue"),
                 }
 
 
-             
+                
             ]
         },
         {
@@ -55,9 +61,9 @@ router.beforeEach((to, from, next) => {
         if (store.state.role == "MASTER") {
           
             next({ name: 'company' });
-        } else if (store.state.role == "REGULAR_USER_ROLE") {
+        } else if (store.state.role == "COMPANY") {
           
-            next({ name: 'forms' });
+            next({ name: 'boxproject' });
         }else if (store.state.role == "SUPER_MASTER"){
          
             next({name : 'administrator'})
@@ -68,8 +74,8 @@ router.beforeEach((to, from, next) => {
       
         if (store.state.role == "MASTER") {
             next({ name: 'company' });
-        } else if (store.state.role == "REGULAR_USER_ROLE") {
-            next({ name: 'forms' });
+        } else if (store.state.role == "COMPANY") {
+            next({ name: 'boxproject' });
         }else if (store.state.role == "SUPER_MASTER"){
             next({name : 'administrator'})
         } else {

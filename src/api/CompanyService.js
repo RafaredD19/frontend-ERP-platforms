@@ -33,15 +33,17 @@ export function requiredFieldsCompany(token , payload) {
         }
      })
 }
-// export function createCompany(token, formDatas) {
-   
-//       return axiosInstance.post(`${baseURL}/companies`, formDatas, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           'Content-Type': 'multipart/form-data'
-//         }
-//       });
-//     }
+
+
+
+export function updateCompany(token ,id, payload) {
+
+    return axiosInstance.patch(`${baseURL}/companies/${id}`, payload, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+     })
+}
 
 export function deleteMasters(token , _id) {
 
@@ -51,6 +53,10 @@ export function deleteMasters(token , _id) {
         }
     })
 }
+
+
+
+
 
 
 

@@ -9,10 +9,9 @@
         <div v-if="statusError" class="flex justify-center">
           <v-alert color="#FF5250" theme="dark" icon="mdi-alert-circle" density="compact" closable class="max-w-[25rem]">
             {{ messageError }}
-
           </v-alert>
         </div>
-        <form-login @validate-login="onValidateLogin" />
+        <form-login  @validate-login="onValidateLogin" />
       </div>
     </div>
   </div>

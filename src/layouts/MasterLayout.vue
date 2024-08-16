@@ -90,6 +90,9 @@ export default {
       const username = ref('');
       const selectedItem = ref(null);
       const ItemsNavegation = ref([
+
+
+      
          
         
           {
@@ -113,6 +116,13 @@ export default {
               to: "/project",
               children: []
           },
+          {
+              icon: "mdi mdi-monitor",
+              title: "Proyectos",
+              value: "boxproject",
+              to: "/boxproject",
+              children: []
+          },
       ]);
 
       const router = useRoute();
@@ -128,8 +138,8 @@ export default {
       const filteredItems = computed(() => {
           if (store.state.role === 'MASTER') {
               return ItemsNavegation.value.filter(item => item.value === 'company'  || item.value ==='project');
-          } else if (store.state.role === 'REGULAR_USER_ROLE') {
-              return ItemsNavegation.value.filter(item => item.value === 'forms' || item.value === 'reportsforms');
+          } else if (store.state.role === 'COMPANY') {
+              return ItemsNavegation.value.filter(item =>  item.value === 'project' || item.value==='boxproject');
           } else if (store.state.role === 'SUPER_MASTER') {
               return ItemsNavegation.value.filter(item => item.value === 'administrator');
           } else {
