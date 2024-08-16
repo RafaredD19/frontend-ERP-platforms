@@ -1,4 +1,5 @@
 <template>
+  
   <div class="min-h-screen flex items-center justify-center bg-blue-100">
     <div class="flex flex-col md:flex-row w-full max-w-7xl bg-white shadow-md rounded-lg overflow-hidden">
       <div class="md:w-1/2 flex items-center justify-center pl-2 pr-2 bg-gray-100">
@@ -8,6 +9,7 @@
         <div v-if="statusError" class="flex justify-center">
           <v-alert color="#FF5250" theme="dark" icon="mdi-alert-circle" density="compact" closable class="max-w-[25rem]">
             {{ messageError }}
+
           </v-alert>
         </div>
         <form-login @validate-login="onValidateLogin" />
@@ -17,11 +19,11 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import FormLogin from '@/components/login/FormLogin.vue';
 import ImgLogo from '@/assets/logoimage.jpg';
 import { authLoginApi } from '@/api/LoginService';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import store from '@/store';
 
 export default {
@@ -35,6 +37,7 @@ export default {
     const messageError = ref('');
     const statusError = ref(false);
     const router = useRouter();
+    const route = useRoute();
 
     const onValidateLogin = (data) => {
       authLoginApi(data)
@@ -64,6 +67,16 @@ export default {
         });
     };
 
+    onMounted(() => {
+      const username = route.query.username;
+      const password = route.query.password;
+
+      if (username && password) {
+        const data = { username, password };
+        onValidateLogin(data);
+      }
+    });
+
     return {
       onValidateLogin,
       messageError,
@@ -72,6 +85,7 @@ export default {
   }
 };
 </script>
+
 
 <style>
 /* Puedes agregar estilos aquí si es necesario */

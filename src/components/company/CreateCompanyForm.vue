@@ -23,6 +23,7 @@
                       @change="toggleProject(project._id)"
                     />
                   </v-list-item-action>
+                  
                 </v-list-item>
               </v-list>
             </div>
@@ -51,9 +52,9 @@
               :label="label"
               required
             ></v-text-field>
+            
           </v-form>
         </v-card-text>
-  
         <v-card-actions>
           <v-btn color="grey" text @click="previousStep">Atrás</v-btn>
           <v-spacer></v-spacer>
@@ -165,13 +166,25 @@
   const submitMasterForm = async () => {
     // Mostrar el diálogo de carga
     dialogLoader.value = true;
-  
-    // Construir el payload final
+
     const payload = {
-      ...formData.value, 
-      projectIds: selectedProjects.value
-    };
-    
+  ...formData.value, 
+  projectIds: selectedProjects.value
+};
+
+// // Crear el FormData
+// const formDatas = new FormData();
+// for (const key in payload) {
+//   if (Object.prototype.hasOwnProperty.call(payload, key)) {
+//     if (key === "projectIds") {
+//       const projectIds = payload[key];
+//       formDatas.append(key, projectIds.join(',')); // Convertir el array en una cadena separada por comas
+//     } else {
+//       formDatas.append(key, payload[key]);
+//     }
+//   }
+// }
+
     const token = store.state.token;
     
     try {
@@ -179,10 +192,12 @@
       Swal.fire({
         icon: 'success',
         title: 'Éxito',
-        text: 'El master se creó correctamente.',
+        text: 'La compañia se creó correctamente.',
       });
-      // Recargar la página
-      location.reload();
+      setTimeout(() => {
+    location.reload();
+  }, 5000); // 3000 milisegundos = 3 segundos
+
     } catch (error) {
       console.error("Error al crear el master:", error);
       Swal.fire({

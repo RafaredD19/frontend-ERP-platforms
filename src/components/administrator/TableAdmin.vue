@@ -18,6 +18,12 @@
     >
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon
+          color="blue"
+          @click="$emit('edit', item)"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon
           color="red"
           @click="$emit('delete', item._id)"
         >
@@ -52,7 +58,7 @@ const headers = [
   {
     key: 'actions',
     title: 'Acciones',
-    align: 'end',
+  
   },
 ];
 

@@ -90,23 +90,11 @@ export default {
       const username = ref('');
       const selectedItem = ref(null);
       const ItemsNavegation = ref([
-          {
-              icon: "mdi-file-question-outline",
-              title: "Formularios",
-              value: "forms",
-              to: "/forms",
-              children: []
-          },
-          {
-              icon: "mdi-form-select",
-              title: "Reportes formularios",
-              value: "reportsforms",
-              to: "/reportsforms",
-              children: []
-          },
+         
+        
           {
               icon: "mdi-domain",
-              title: "company",
+              title: "Compañias",
               value: "company",
               to: "/company",
               children: []
@@ -117,7 +105,14 @@ export default {
               value: "administrator",
               to: "/administrator",
               children: []
-          }
+          },
+          {
+              icon: "mdi mdi-monitor",
+              title: "Proyectos",
+              value: "project",
+              to: "/project",
+              children: []
+          },
       ]);
 
       const router = useRoute();
@@ -132,7 +127,7 @@ export default {
 
       const filteredItems = computed(() => {
           if (store.state.role === 'MASTER') {
-              return ItemsNavegation.value.filter(item => item.value === 'company');
+              return ItemsNavegation.value.filter(item => item.value === 'company'  || item.value ==='project');
           } else if (store.state.role === 'REGULAR_USER_ROLE') {
               return ItemsNavegation.value.filter(item => item.value === 'forms' || item.value === 'reportsforms');
           } else if (store.state.role === 'SUPER_MASTER') {

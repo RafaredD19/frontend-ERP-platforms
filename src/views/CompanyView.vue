@@ -28,11 +28,7 @@
     try {
       const token = store.state.token;
       const response = await findAllCompanies(token);
-      masters.value = response.data.data.map(master => ({
-        business: master.business,
-        user: master.user,
-        _id : master._id
-      }));
+      masters.value = response.data.data;
     } catch (error) {
       console.error("Error loading masters", error);
     }
