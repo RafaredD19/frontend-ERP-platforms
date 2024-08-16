@@ -31,13 +31,13 @@
             </div>
   
             <!-- Campos dinámicos del formulario -->
-            <div v-if="Object.keys(formData).length > 0" class="mt-4">
+            <div v-if="Object.keys(requiredFields).length > 0" class="mt-4">
               <h3 class="text-lg font-semibold mb-2">Completar Información del Master</h3>
               <v-text-field
-                v-for="(value, field) in formData"
+                v-for="(label, field) in requiredFields"
                 :key="field"
                 v-model="formData[field]"
-                :label="getLabel(field)"
+                :label="label"
                 required
               ></v-text-field>
             </div>
@@ -51,6 +51,7 @@
                 accept="image/*"
                 prepend-icon="mdi-camera"
                 :show-size="true"
+                required
               ></v-file-input>
             </div>
           </v-form>
@@ -69,7 +70,7 @@
   import { ref, watch, onMounted } from 'vue';
   import Swal from 'sweetalert2';
   import { findAllProjects } from "@/api/ProjectsService";
-  import { updateMaster } from "@/api/AdministratorService";
+  import { updateMaster , requiredFieldsMasters} from "@/api/AdministratorService";
   import store from "@/store";
   
   const props = defineProps({
@@ -90,6 +91,7 @@
   
   const projects = ref([]);
   const selectedProjects = ref([]);
+  const requiredFields = ref({});
   const formData = ref({});
   const selectedImage = ref(null);
   
@@ -103,6 +105,7 @@
   const close = () => {
     emit('update:modelValue', false);
     selectedProjects.value = [];
+    requiredFields.value = {};
     formData.value = {};
     selectedImage.value = null;
   };
@@ -117,16 +120,19 @@
     }
   };
   
-  const initializeForm = () => {
+  const initializeForm = async () => {
     formData.value = {
       business: props.masterData.business,
+      username: props.masterData.user.username,
+      password: props.masterData.user.password,
       usernameWialon: props.masterData.usernameWialon,
       passwordWialon: props.masterData.passwordWialon,
       tokenWialon: props.masterData.tokenWialon,
     };
   
     selectedProjects.value = props.masterData.projects.map(project => project._id);
-    loadRequiredFields(); // Cargar campos dinámicos basados en proyectos seleccionados
+  
+    await loadRequiredFields();
   };
   
   const isProjectSelected = (projectId) => {
@@ -139,22 +145,25 @@
     } else {
       selectedProjects.value.push(projectId);
     }
+    
     await loadRequiredFields(); // Volver a cargar los campos cuando se cambia la selección de proyectos
   };
   
   const loadRequiredFields = async () => {
     const token = store.state.token;
+    const masterId = props.masterData._id; // Obtener el _id del master
     const payload = { projectIds: selectedProjects.value };
   
     try {
-      const response = await requiredFieldsMasters(token, payload);
-      formData.value = { ...formData.value, ...response.data.data };
+      const response = await requiredFieldsMasters(token, payload,masterId);
+      requiredFields.value = response.data.data;
   
-      // Inicializa formData con campos vacíos si no existen
-      for (const field in response.data.data) {
-        if (!formData.value[field]) {
-          formData.value[field] = '';
-        }
+      // Mantén los campos existentes en formData
+      const existingData = { ...formData.value };
+      
+      // Inicializa formData con los nuevos campos requeridos, sin borrar los valores existentes
+      for (const field in requiredFields.value) {
+        formData.value[field] = existingData[field] || '';
       }
     } catch (error) {
       console.error("Error fetching required fields:", error);
@@ -164,16 +173,6 @@
         text: error.response?.data?.message || 'Ocurrió un error al obtener los campos requeridos.',
       });
     }
-  };
-  
-  const getLabel = (field) => {
-    const labels = {
-      business: "Nombre de la Empresa",
-      usernameWialon: "Usuario Wialon",
-      passwordWialon: "Contraseña Wialon",
-      tokenWialon: "Token Wialon"
-    };
-    return labels[field] || field;
   };
   
   const submitEditForm = async () => {

@@ -42,6 +42,19 @@ export function createMasters(token, formDatas) {
        }
      });
     }
+
+
+    export function updateMaster(token,masterId, formDatas) {
+   
+        return axiosInstance.patch(`${baseURL}/masters/${masterId}`, formDatas, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+     }
+ 
+
 export function deleteMasters(token , _id) {
 
     return axiosInstance.delete(`${baseURL}/masters/${_id}`, {

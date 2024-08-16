@@ -63,11 +63,7 @@ const headers = [
 ];
 
 const filteredMasters = computed(() => {
-  return props.masters.map(master => ({
-    business: master.business,
-    user: master.user,
-    _id : master._id
-  }));
+  return props.masters
 });
 </script>
 

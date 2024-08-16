@@ -7,8 +7,9 @@
         </v-btn>
       </v-col>
     </v-row>
-    <TableAdmin :masters="masters" @delete="confirmDelete" />
+    <TableAdmin :masters="masters" @delete="confirmDelete" @edit="openEditForm" />
     <CreateMasterForm v-model="showCreateForm" @next="handleNextStep" />
+    <EditMasterForm v-model="showEditForm" :masterData="selectedMaster" @updated="loadMasters" />
   </v-container>
 </template>
 
@@ -17,22 +18,20 @@ import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import TableAdmin from "@/components/administrator/TableAdmin.vue";
 import CreateMasterForm from "@/components/administrator/CreateMasterForm.vue";
+import EditMasterForm from "@/components/administrator/EditMasterForm.vue";
 import { findAllMasters, deleteMasters } from "@/api/AdministratorService";
 import store from "@/store";
 
 const masters = ref([]);
 const showCreateForm = ref(false);
-const selectedProjects = ref({}); // Guardará los proyectos seleccionados
+const showEditForm = ref(false);
+const selectedMaster = ref(null);
 
 const loadMasters = async () => {
   try {
     const token = store.state.token;
     const response = await findAllMasters(token);
-    masters.value = response.data.data.map(master => ({
-      business: master.business,
-      user: master.user,
-      _id : master._id
-    }));
+    masters.value = response.data.data;
   } catch (error) {
     console.error("Error loading masters", error);
   }
@@ -42,10 +41,9 @@ const openCreateForm = () => {
   showCreateForm.value = true;
 };
 
-const handleNextStep = (projectAccess) => {
-  selectedProjects.value = projectAccess;
-  console.log('Proyectos seleccionados:', selectedProjects.value);
-  // Aquí puedes manejar la transición al siguiente paso
+const openEditForm = (master) => {
+  selectedMaster.value = master;
+  showEditForm.value = true;
 };
 
 const confirmDelete = async (_id) => {
