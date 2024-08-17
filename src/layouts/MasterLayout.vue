@@ -137,11 +137,11 @@ export default {
 
       const filteredItems = computed(() => {
           if (store.state.role === 'MASTER') {
-              return ItemsNavegation.value.filter(item => item.value === 'company'  || item.value ==='project');
+              return ItemsNavegation.value.filter(item => item.value === 'company'  || item.value==='boxproject' );
           } else if (store.state.role === 'COMPANY') {
-              return ItemsNavegation.value.filter(item =>  item.value === 'project' || item.value==='boxproject');
+              return ItemsNavegation.value.filter(item =>   item.value==='boxproject');
           } else if (store.state.role === 'SUPER_MASTER') {
-              return ItemsNavegation.value.filter(item => item.value === 'administrator');
+              return ItemsNavegation.value.filter(item => item.value === 'administrator' || item.value ==='project');
           } else {
               return [];
           }

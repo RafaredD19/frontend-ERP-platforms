@@ -1,4 +1,7 @@
 <template>
+  <v-card-title>
+      <h1 class="font-bold lg:text-3xl text-xl text-gray-400">Mantenimiento de Compañias</h1>
+    </v-card-title>
   <v-container>
     <v-row justify="end" class="mb-4">
       <v-col cols="auto">

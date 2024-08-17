@@ -55,6 +55,14 @@ export function deleteMasters(token , _id) {
 }
 
 
+export function findRecourses(token  ) {
+
+    return axiosInstance.get(`${baseURL}/companies/recourses`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
 
 
 

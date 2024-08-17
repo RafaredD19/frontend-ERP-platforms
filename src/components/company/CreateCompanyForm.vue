@@ -32,18 +32,33 @@
                 </v-list-item>
               </v-col>
             </v-row>
+            <div v-if="projects.length === 0">
+              <p>No se encontraron proyectos.</p>
+            </div>
           </div>
 
           <!-- Campos dinámicos del formulario -->
           <div v-if="Object.keys(requiredFields).length > 0" class="mt-4">
             <h3 class="text-lg font-semibold mb-2">Completar Información de la Compañía</h3>
-            <v-text-field
-              v-for="(label, field) in requiredFields"
-              :key="field"
-              v-model="formData[field]"
-              :label="label"
-              required
-            ></v-text-field>
+            <div v-for="(label, field) in requiredFields" :key="field">
+              <!-- Si el label es "Recurso de wialon", muestra un campo seleccionable -->
+              <v-select
+                v-if="label === 'Recurso de wialon'"
+                v-model="formData[field]"
+                :items="resourceNames"
+                item-text="name"
+                item-value="id"
+                :label="label"
+                required
+              ></v-select>
+              <!-- Caso contrario, muestra un campo de texto -->
+              <v-text-field
+                v-else
+                v-model="formData[field]"
+                :label="label"
+                required
+              ></v-text-field>
+            </div>
           </div>
         </v-form>
       </v-card-text>
@@ -71,7 +86,7 @@
 import { ref, onMounted, watch, nextTick } from 'vue';
 import Swal from 'sweetalert2';
 import { findAllProjects } from "@/api/ProjectsService";
-import { requiredFieldsCompany, createCompany } from "@/api/CompanyService";
+import { requiredFieldsCompany, createCompany, findRecourses } from "@/api/CompanyService";
 import store from "@/store";
 
 const props = defineProps({
@@ -90,6 +105,8 @@ const projects = ref([]);
 const selectedProjects = ref([]);
 const requiredFields = ref({});
 const formData = ref({});
+const resourceNames = ref([]); // Lista de nombres de recursos
+const resourceMap = ref({}); // Mapa de nombres a IDs
 
 watch(() => props.modelValue, (newVal) => {
   dialog.value = newVal;
@@ -112,6 +129,20 @@ const loadProjects = async () => {
     projects.value = response.data.data;
   } catch (error) {
     console.error("Error loading projects", error);
+  }
+};
+
+const loadRecourses = async () => {
+  try {
+    const token = store.state.token;
+    const response = await findRecourses(token);
+    const resources = response.data.data;
+    resourceNames.value = resources.map(resource => resource.name);
+    resources.forEach(resource => {
+      resourceMap.value[resource.name] = resource.id;
+    });
+  } catch (error) {
+    console.error("Error loading resources", error);
   }
 };
 
@@ -160,12 +191,21 @@ const submitCompanyForm = async () => {
     return;
   }
 
-  dialogLoader.value = true;
+  // Si el campo "Recurso de wialon" está en el formulario, sustituir el valor con el ID correspondiente
+  for (const field in requiredFields.value) {
+    if (requiredFields.value[field] === 'Recurso de wialon') {
+      formData.value[field] = resourceMap.value[formData.value[field]];
+    }
+  }
 
   const payload = {
     ...formData.value, 
     projectIds: selectedProjects.value
   };
+
+  console.log("Payload enviado:", JSON.stringify(payload, null, 2)); // Imprimir el payload en formato JSON
+
+  dialogLoader.value = true;
 
   const token = store.state.token;
 
@@ -198,9 +238,9 @@ const submitCompanyForm = async () => {
   }
 };
 
-
 onMounted(() => {
   loadProjects();
+  loadRecourses(); // Cargar los recursos disponibles al montar el componente
 });
 </script>
 

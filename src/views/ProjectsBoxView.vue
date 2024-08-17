@@ -1,4 +1,7 @@
 <template>
+   <v-card-title>
+      <h1 class="font-bold lg:text-3xl text-xl text-gray-400">Proyectos disponibles</h1>
+    </v-card-title>
   <v-container class="bg-gray-100 min-h-screen py-6">
     <v-row>
       <v-col
