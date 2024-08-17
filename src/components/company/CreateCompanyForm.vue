@@ -41,7 +41,7 @@
           <div v-if="Object.keys(requiredFields).length > 0" class="mt-4">
             <h3 class="text-lg font-semibold mb-2">Completar Información de la Compañía</h3>
             <div v-for="(label, field) in requiredFields" :key="field">
-              <!-- Si el label es "Recurso de wialon", muestra un campo seleccionable -->
+              <!-- Si el label es "Recurso de wialon", muestra un campo seleccionable con búsqueda -->
               <v-select
                 v-if="label === 'Recurso de wialon'"
                 v-model="formData[field]"
@@ -49,6 +49,7 @@
                 item-text="name"
                 item-value="id"
                 :label="label"
+                :searchable="true"
                 required
               ></v-select>
               <!-- Caso contrario, muestra un campo de texto -->
