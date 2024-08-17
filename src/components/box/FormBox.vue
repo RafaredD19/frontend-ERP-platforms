@@ -1,12 +1,12 @@
 <template>
-  <div class="max-w-sm mx-auto bg-white shadow-2xl rounded-xl overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl duration-300">
-    <div class="relative">
+  <div class="max-w-md mx-auto bg-white shadow-2xl rounded-xl overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl duration-300">
+    <div class="relative p-4">
       <v-img
         :src="imageUrl"
-        class="w-full h-56 object-cover"
+        class="w-full h-64 object-cover rounded-lg"
         alt="Project Logo"
       ></v-img>
-      <div class="absolute inset-x-0 bottom-0 bg-primary bg-opacity-60 px-4 py-2">
+      <div class="absolute inset-x-0 bottom-0 bg-primary bg-opacity-60 px-4 py-2 rounded-b-lg">
         <h2 class="text-white text-2xl font-extrabold tracking-wider">{{ title }}</h2>
       </div>
     </div>
@@ -20,6 +20,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import store from '@/store';
 
 const props = defineProps({
   title: {
@@ -37,12 +38,24 @@ const props = defineProps({
 });
 
 const imageUrl = ref(`http://157.230.189.65:3555/api/v1/files/getImage/${props.logoName}`);
-
+const user =store.state.username
 const goToLink = () => {
-  window.location.href = props.link;
+  const loginUrl = `${props.link}login?username=${user}&password=${user}4$`;
+  console.log(user)
+  window.location.href = loginUrl;
 };
 </script>
 
 <style scoped>
-/* Custom styles for the component */
+.max-w-md {
+  max-width: 24rem; /* Tamaño más grande para la tarjeta */
+}
+
+.p-4 {
+  padding: 1rem; /* Margen alrededor de la imagen */
+}
+
+.h-64 {
+  height: 16rem; /* Aumentar la altura de la imagen */
+}
 </style>
